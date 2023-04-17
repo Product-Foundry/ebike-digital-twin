@@ -3,12 +3,51 @@ define('main', ['js/runner/DataFileReader',
   'js/spec/SpecRealizer',
   'js/tools/Draggable',
   'js/tools/Gsap',
-  'js/spec/BicycleSpecification'
+  'js/spec/BicycleSpecification',
+  'js/runner/EventStack',
+  'js/tools/chart',
 ],
-  function (DataFileReader, MachinePropagation, SpecRealizer, Draggable, gsap, BicycleSpecification) {
+  function (DataFileReader, MachinePropagation, SpecRealizer, Draggable, gsap, BicycleSpecification, EventStack, Chart) {
     gsap.gsap.registerPlugin(Draggable);
     const bs = new BicycleSpecification();
+    const eventStack = new EventStack();
     let timer, ebike;
+    function range(size, startAt = 0, interval = 1) {
+      return [...Array(size).keys()].map(i => (i + startAt) * interval);
+    }
+    const chart = new Chart(document.getElementById('chart-container-1'), {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Ebike via ASC zone',
+          data: eventStack.history.map(eState => {
+            return {
+              x: eState.asc.timestamp,
+              y: eState.motor.current,
+              loc: eState.asc.location
+            }
+          }),
+          fill: false,
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1
+        },
+        ]
+      },
+      options: {
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (item) => {
+                return `${item.raw.y} A at  ${item.raw.x} (${item.raw.loc.latitude}, ${item.raw.loc.longitude})`
+              }
+            },
+          },
+        },
+        onClick: (e) => {
+        }
+      }
+    });
 
     function printState() {
       $(".selected-model")[0].innerHTML = JSON.stringify(ebike, null, 2);
@@ -118,7 +157,7 @@ define('main', ['js/runner/DataFileReader',
       if (inputslider.id === "torqueSensor") ebike.setTorqueReading(finalValue);
       else if (inputslider.id === "cadenceSensor") ebike.setCadenceReading(finalValue);
       else if (inputslider.id === "currentSensor") ebike.setMotorCurrent(finalValue);
-      else if (inputslider.id === "rpmSensor") ebike.rpm = finalValue;
+      else if (inputslider.id === "rpmSensor") ebike.setRpm(finalValue);
       printState();
     }
     $("#start").on("click", function (e) {
@@ -138,7 +177,7 @@ define('main', ['js/runner/DataFileReader',
         start.addClass("btn-secondary");
         start[0].innerHTML = "Stop";
 
-        timer = startTimer(0, "timer");
+        timer = startTimer(0, "timer", ebike);
         $("#pause").removeAttr("disabled");
         $("#pause").off("click");
         $("#pause").on("click", function (event) {
@@ -269,6 +308,8 @@ define('main', ['js/runner/DataFileReader',
         printState();
 
       })
+      $(".asc-input").on("change", function () {
+      })
       $(".loading-indicator").attr("style", "display: none !important");
 
     })
@@ -282,19 +323,41 @@ define('main', ['js/runner/DataFileReader',
       const f = new DataFileReader(files[0]);
       const check = function () {
         const events = f.getEvents();
+        // if (events) {
+        //   events.forEach((event, i) => {
+        //     mpArray[i] = new MachinePropagation(event.bikeSpecification, event.timestamp, event.numRotation);
+        //   });
+        //   mpArray.forEach(a => {
+        //     const tr = $("<tr></tr>")
+        //     $(tr).append("<td>" + a.bike.etrtoSpecification.etrtoValue + "</td>")
+        //       .append("<td>" + new Date(a.timestamp * 1000).toTimeString().split(" ")[0] + "</td>")
+        //       .append("<td>" + a.wheelRotations + " pm </td>")
+        //       .append("<td>" + a.speed + " kmph </td>")
+        //     $(reportTable).append(tr)
+        //   })
+        //   return;
+        // }
         if (events) {
-          events.forEach((event, i) => {
-            mpArray[i] = new MachinePropagation(event.bikeSpecification, event.timestamp, event.numRotation);
-          });
-          mpArray.forEach(a => {
-            const tr = $("<tr></tr>")
-            $(tr).append("<td>" + a.bike.etrtoSpecification.etrtoValue + "</td>")
-              .append("<td>" + new Date(a.timestamp * 1000).toTimeString().split(" ")[0] + "</td>")
-              .append("<td>" + a.wheelRotations + " pm </td>")
-              .append("<td>" + a.speed + " kmph </td>")
-            $(reportTable).append(tr)
-          })
-          return;
+          const readAsEvents = setInterval(function () {
+            if (events.length === 0) {
+              clearInterval(readAsEvents);
+              console.log("Chart complete");
+            } else {
+              function callback() {
+                chart.data.labels.push(ebike.asc.timestamp);
+                chart.data.datasets.forEach((dataset) => {
+                  dataset.data.push({
+                    x: ebike.asc.timestamp,
+                    y: ebike.motor.current,
+                    loc: ebike.asc.location
+                  });
+                });
+                chart.update();
+              }
+              ebike.setLocation(events.shift(), callback);
+              eventStack.push(ebike);
+            }
+          }, 100)
         }
         setTimeout(check, 1000);
       }

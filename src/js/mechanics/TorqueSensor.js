@@ -1,4 +1,4 @@
-/* EBike Tire */
+/* Torque measured at crank or rear wheel  */
 define('js/mechanics/TorqueSensor', [], function () {
 
     function TorqueSensor() {

@@ -1,4 +1,4 @@
-/* EBike Tire */
+/* EBike Motor */
 define('js/mechanics/Motor', [], function () {
 
     function Motor() {

@@ -1,7 +1,7 @@
 /* Model of the physical EBike */
-define('js/mechanics/EBike', [], function () {
+define('js/mechanics/EBike', ['js/town/AscClient'], function (AscClient) {
 
-    function EBike() {
+    function EBike(zm) {
         this.id = null;
         this.name = null;
         this.frontSprocket = null;
@@ -13,6 +13,8 @@ define('js/mechanics/EBike', [], function () {
         this.supportSetting = null;
         this.availableSupportSettings = null;
         this.rpm = null;
+        this.insideZone = null;
+        this.asc = new AscClient(zm);
     }
 
     EBike.prototype.init = function () {
@@ -77,6 +79,12 @@ define('js/mechanics/EBike', [], function () {
         this.motor.setCurrent(reading);
     }
 
+    EBike.prototype.setRpm = function (reading) {
+        this.rpm = reading;
+        const tcInKm = this.tire.circumference / 1000000;
+        this.speed = tcInKm * reading / 60 //inkph 
+    }
+
     EBike.prototype.getTotalTorque = function () {
         if (this.motor.position === "crank") {
             if (this.torqueSensor.position === "crank") {
@@ -132,6 +140,22 @@ define('js/mechanics/EBike', [], function () {
             console.error("Unknown motor position");
         }
 
+    }
+
+    EBike.prototype.setLocation = function (location, callback) {
+        this.asc.location = location;
+        const t = new Date().toTimeString().split(' ');
+        this.asc.timestamp = t[0];
+        this.asc.checkRestrictions(this, callback);
+    }
+
+    EBike.prototype.flagNc = function (restriction) {
+        if (restriction.protocol === "SPEED_LIMIT") {
+            this.speed = restriction.speedLimitKph;
+        }
+    }
+
+    EBike.prototype.notifyApproach = function (restriction) {
     }
 
     return EBike;

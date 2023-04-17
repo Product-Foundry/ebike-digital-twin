@@ -10,7 +10,7 @@ define('js/mechanics/MachinePropagation', [], function () {
   }
 
   MachinePropagation.prototype.calculateBikeSpeed = function (numRotations) {
-    return this.bike.etrtoSpecification.tireCircumference * numRotations;
+    return this.bike.etrtoSpecification.circumference * numRotations;
   }
 
   return MachinePropagation;

@@ -6,7 +6,11 @@ define('js/runner/DataFileReader', [], function () {
     if (f.type) {
       let reader = new FileReader();
       reader.onload = () => {
-        this.textToEvents(reader.result);
+        if (f.type === "application/json") {
+          this.jsonToEvents(reader.result);
+        } else {
+          this.textToEvents(reader.result);
+        }
       };
       reader.readAsText(f);
 
@@ -36,6 +40,16 @@ define('js/runner/DataFileReader', [], function () {
         numRotation: e[2],
       }
     }).flat();
+  }
+
+  DataFileReader.prototype.jsonToEvents = function (text) {
+    const content = JSON.parse(text);
+    this.events = content.points.map(c => {
+      return {
+        latitude: c.lat,
+        longitude: c.lng
+      }
+    })
   }
 
   DataFileReader.prototype.getEvents = function () {

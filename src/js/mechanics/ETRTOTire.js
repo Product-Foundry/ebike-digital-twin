@@ -6,7 +6,7 @@ define('js/mechanics/ETRTOTire', [], function () {
 
     ETRTOTire.prototype.init = function () {
         if (this.radius && this.rimDiameter) {
-            this.tireCircumference = ((2 * this.radius) + this.rimDiameter) * 3.14;
+            this.circumference = ((2 * this.radius) + this.rimDiameter) * 3.14;
         }
     }
 

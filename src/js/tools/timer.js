@@ -1,4 +1,4 @@
-function startTimer(seconds, container) {
+function startTimer(seconds, container, ebike) {
     let startTime, timer, obj, ms = seconds * 1000,
         display = document.getElementById(container);
     obj = {};
@@ -28,14 +28,14 @@ function startTimer(seconds, container) {
             // if( oncomplete) oncomplete();
         }
         const right = $(".digital-twin .right")[0];
-        const ss = $("input:radio[name ='btnradioss']:checked").val();
+        const ss = ebike.supportSetting;
         const sfg = $("input:radio[name ='btnradiofg']:checked").val();
         const srg = $("input:radio[name ='btnradiorg']:checked").val();
         const ssg = $("input:radio[name ='btnradiosg']:checked").val();
-        const cad = $("#cadenceSensor input")[0].value;
-        const tor = $("#torqueSensor input")[0].value;
-        const rpm = $("#rpmSensor input")[0].value;
-        const curr = $("#currentSensor input")[0].value;
+        const cad = ebike.cadenceSensor.reading;
+        const tor = ebike.torqueSensor.reading;
+        const rpm = ebike.rpm;
+        const curr = ebike.motor.current;
 
 
         // $(right).append("<div>" +
