@@ -44,6 +44,12 @@ define('main', ['js/runner/DataFileReader',
             },
           },
         },
+        animation: {
+          y: {
+            duration: 0,
+            from: 0
+          }
+        },
         onClick: (e) => {
         }
       }
