@@ -2,7 +2,15 @@
     "points": [
         {
             "lat": 52.37818934422072,
-            "lng": 4.885984850069164
+            "lng": 4.885984850069164,
+            "supportSetting": 3,
+            "cannibalCurrent": 0,
+            "cannibalVoltage": 0,
+            "wheelRpm": 0,
+            "cadence": 0,
+            "torque": 0,
+            "ebikeMotorCurrent": 0,
+            "ebikeMotorVoltage": 0
         },
         {
             "lat": 52.37818155617711,

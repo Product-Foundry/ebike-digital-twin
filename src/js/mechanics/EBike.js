@@ -1,7 +1,7 @@
 /* Model of the physical EBike */
 define('js/mechanics/EBike', ['js/town/AscClient'], function (AscClient) {
 
-    function EBike(zm) {
+    function EBike() {
         this.id = null;
         this.name = null;
         this.frontSprocket = null;
@@ -14,7 +14,7 @@ define('js/mechanics/EBike', ['js/town/AscClient'], function (AscClient) {
         this.availableSupportSettings = null;
         this.rpm = null;
         this.insideZone = null;
-        this.asc = new AscClient(zm);
+        this.asc = new AscClient();
     }
 
     EBike.prototype.init = function () {

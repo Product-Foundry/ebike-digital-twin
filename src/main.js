@@ -12,9 +12,9 @@ define('main', ['js/runner/DataFileReader',
     const bs = new BicycleSpecification();
     const eventStack = new EventStack();
     let timer, ebike;
-    function range(size, startAt = 0, interval = 1) {
-      return [...Array(size).keys()].map(i => (i + startAt) * interval);
-    }
+    // function range(size, startAt = 0, interval = 1) {
+    //   return [...Array(size).keys()].map(i => (i + startAt) * interval);
+    // }
     const chart = new Chart(document.getElementById('chart-container-1'), {
       type: 'line',
       data: {
